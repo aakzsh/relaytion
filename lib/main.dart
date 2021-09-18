@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:relaytion/HealthCare/login.dart';
+import 'package:relaytion/PoliceDept/login.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +47,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           MaterialPageRoute(
                               builder: (context) => HospitalLogin()));
                     }),
-                MaterialButton(child: Text("Police side"), onPressed: () {})
+                MaterialButton(
+                    child: Text("Police side"),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PoliceLogin()));
+                    })
               ],
             )
           ],
