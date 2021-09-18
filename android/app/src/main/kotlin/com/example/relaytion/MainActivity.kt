@@ -1,4 +1,4 @@
-package com.example.relaytion
+package com.relaytion.app
 
 import io.flutter.embedding.android.FlutterActivity
 

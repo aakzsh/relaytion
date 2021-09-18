@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.relaytion">
+    package="com.relaytion.app">
    <application
         android:label="relaytion"
         android:icon="@mipmap/ic_launcher">

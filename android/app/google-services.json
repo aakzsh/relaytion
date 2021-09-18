@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "659111712935",
+    "project_id": "relaytionn",
+    "storage_bucket": "relaytionn.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:659111712935:android:8f90ee891a0f15ac766382",
+        "android_client_info": {
+          "package_name": "com.relaytion.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "659111712935-4jledip6bdat170pa3b981ns2sje2a1e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJyaQLx74SfV0uvp1Bjil2rzquXt5uBxg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "659111712935-4jledip6bdat170pa3b981ns2sje2a1e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
