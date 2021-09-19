@@ -33,99 +33,125 @@ class RequestState extends State<Request> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Stack(
-      children: [
-        GoogleMap(
-          mapType: MapType.normal,
-          initialCameraPosition: CameraPosition(
-            target: _initialPosition,
-            zoom: 14.4746,
-          ),
-          onMapCreated: (GoogleMapController controller) {
-            _controller.complete(controller);
-          },
-          markers: _markers,
-          myLocationButtonEnabled: true,
-          onCameraMove: onCameraMove,
-        ),
-        Positioned(
-          top: 50.0,
-          right: 15.0,
-          left: 15.0,
-          child: Container(
-            height: 50.0,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(3.0),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.grey,
-                    offset: Offset(1.0, 5.0),
-                    blurRadius: 10,
-                    spreadRadius: 3)
-              ],
+    return _initialPosition == null
+        ? Container(
+            alignment: Alignment.center,
+            child: Center(
+              child: CircularProgressIndicator(),
             ),
-            child: TextField(
-              cursorColor: Colors.black,
-              decoration: InputDecoration(
-                icon: Container(
-                  margin: EdgeInsets.only(left: 20, top: 5),
-                  width: 10,
-                  height: 10,
-                  child: Icon(
-                    Icons.location_on,
-                    color: Colors.black,
+          )
+        : Scaffold(
+            body: Stack(
+              children: [
+                GoogleMap(
+                  mapType: MapType.normal,
+                  initialCameraPosition: CameraPosition(
+                    target: _initialPosition,
+                    zoom: 14.4746,
+                  ),
+                  onMapCreated: (GoogleMapController controller) {
+                    _controller.complete(controller);
+                  },
+                  markers: _markers,
+                  myLocationButtonEnabled: true,
+                  onCameraMove: onCameraMove,
+                  polylines: _polyLines,
+                ),
+                Positioned(
+                  top: 50.0,
+                  right: 15.0,
+                  left: 15.0,
+                  child: Container(
+                    height: 50.0,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3.0),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.grey,
+                            offset: Offset(1.0, 5.0),
+                            blurRadius: 10,
+                            spreadRadius: 3)
+                      ],
+                    ),
+                    child: TextField(
+                      controller: locationController,
+                      cursorColor: Colors.black,
+                      decoration: InputDecoration(
+                        icon: Container(
+                          margin: EdgeInsets.only(left: 20, top: 5),
+                          width: 10,
+                          height: 10,
+                          child: Icon(
+                            Icons.location_on,
+                            color: Colors.black,
+                          ),
+                        ),
+                        hintText: "Starting Point",
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.only(left: 15.0, top: 16.0),
+                      ),
+                    ),
                   ),
                 ),
-                hintText: "Starting Point",
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.only(left: 15.0, top: 16.0),
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 105.0,
-          right: 15.0,
-          left: 15.0,
-          child: Container(
-            height: 50.0,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(3.0),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.grey,
-                    offset: Offset(1.0, 5.0),
-                    blurRadius: 10,
-                    spreadRadius: 3)
-              ],
-            ),
-            child: TextField(
-              cursorColor: Colors.black,
-              textInputAction: TextInputAction.go,
-              decoration: InputDecoration(
-                icon: Container(
-                  margin: EdgeInsets.only(left: 20, top: 5),
-                  width: 10,
-                  height: 10,
-                  child: Icon(
-                    Icons.local_taxi,
-                    color: Colors.black,
+                Positioned(
+                  top: 105.0,
+                  right: 15.0,
+                  left: 15.0,
+                  child: Container(
+                    height: 50.0,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3.0),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.grey,
+                            offset: Offset(1.0, 5.0),
+                            blurRadius: 10,
+                            spreadRadius: 3)
+                      ],
+                    ),
+                    child: TextField(
+                      cursorColor: Colors.black,
+                      controller: destinationController,
+                      onSubmitted: (value) {
+                        sendRequest(value);
+                      },
+                      textInputAction: TextInputAction.go,
+                      decoration: InputDecoration(
+                        icon: Container(
+                          margin: EdgeInsets.only(left: 20, top: 5),
+                          width: 10,
+                          height: 10,
+                          child: Icon(
+                            Icons.local_taxi,
+                            color: Colors.black,
+                          ),
+                        ),
+                        hintText: "Destination",
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.only(left: 15.0, top: 16.0),
+                      ),
+                    ),
                   ),
                 ),
-                hintText: "Destination",
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.only(left: 15.0, top: 16.0),
-              ),
+              ],
             ),
-          ),
-        ),
-      ],
-    ));
+          );
+  }
+
+  List<LatLng> convertToLatLng(List points) {
+    List<LatLng> result = <LatLng>[];
+
+    for (int i = 0; i < points.length; i++) {
+      if (i % 2 != 0) {
+        result.add(LatLng(points[i - 1], points[i]));
+      }
+    }
+
+    return result;
   }
 
   List _decodePoly(String poly) {
@@ -182,6 +208,43 @@ class RequestState extends State<Request> {
         "the latitude is: ${position.longitude} and the longitude is: ${position.longitude} ");
     print("initial position is : ${_initialPosition.toString()}");
     locationController.text = placemark[0].name;
+  }
+
+  void sendRequest(String intendedLocation) async {
+    List<Placemark> placemark =
+        await Geolocator().placemarkFromAddress(intendedLocation);
+    double latitude = placemark[0].position.latitude;
+    double longitude = placemark[0].position.longitude;
+    LatLng destination = LatLng(latitude, longitude);
+    print("====================================");
+    print(intendedLocation);
+    _addMarker(destination, intendedLocation);
+    String route = await _googleMapsServices.getRouteCoordinates(
+        _initialPosition, destination);
+    createRoute(route);
+    // notifyListeners();
+  }
+
+  void _addMarker(LatLng location, String address) {
+    setState(() {
+      _markers.add(Marker(
+          markerId: MarkerId(_lastPosition.toString()),
+          position: location,
+          infoWindow: InfoWindow(title: address, snippet: "go here"),
+          icon: BitmapDescriptor.defaultMarker));
+    });
+    // notifyListeners();
+  }
+
+  void createRoute(String encondedPoly) {
+    setState(() {
+      _polyLines.add(Polyline(
+          polylineId: PolylineId(_lastPosition.toString()),
+          width: 10,
+          points: convertToLatLng(_decodePoly(encondedPoly)),
+          color: Colors.black));
+    });
+    // notifyListeners();
   }
 
   // Future<void> _goToTheLake() async {
