@@ -1,38 +1,114 @@
 import 'package:flutter/material.dart';
-import 'login2.dart';
+import 'package:relaytion/HealthCare/home.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:relaytion/HealthCare/signup.dart';
 
 class HospitalLogin extends StatefulWidget {
   @override
   _HospitalLoginState createState() => _HospitalLoginState();
 }
 
-TextEditingController email;
-TextEditingController pass;
+String email, pass;
 
 class _HospitalLoginState extends State<HospitalLogin> {
   @override
   Widget build(BuildContext context) {
+    double w = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Container(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-            Text("login"),
-            TextField(
-              controller: email,
-              decoration: InputDecoration(hintText: "email"),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text("Log In",
+                    style: GoogleFonts.josefinSans(
+                        fontSize: 35, fontWeight: FontWeight.bold)),
+              ),
             ),
-            TextField(
-              controller: pass,
-              decoration: InputDecoration(hintText: "password"),
+            Column(
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 40),
+                  child: TextField(
+                    onChanged: (value) {
+                      email = value;
+                    },
+                    decoration: new InputDecoration(
+                      labelText: "Email",
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 50,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 40),
+                  child: TextField(
+                    onChanged: (value) {
+                      pass = value;
+                    },
+                    decoration: new InputDecoration(
+                      labelText: "Password",
+                    ),
+                  ),
+                ),
+              ],
             ),
             MaterialButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => HospitalLogin2()));
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                  side: BorderSide(color: Color.fromRGBO(223, 74, 74, 1))),
+              height: 60,
+              minWidth: w - 80,
+              color: Color.fromRGBO(223, 74, 74, 1),
+              onPressed: () async {
+                await FirebaseAuth.instance
+                    .signInWithEmailAndPassword(email: email, password: pass)
+                    .then((value) {
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HospitalHome(),
+                      ));
+                }).catchError((err) {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text("Error"),
+                          content: Text(err.message),
+                          actions: [
+                            TextButton(
+                              child: Text("Ok"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            )
+                          ],
+                        );
+                      });
+                });
               },
-              child: Text("login"),
-            )
+              child: Text(
+                "LogIn",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+            ),
+            MaterialButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => HospitalSignup()));
+                },
+                child: Text(
+                  "Don't have an account? Register",
+                  style: TextStyle(color: Colors.blue),
+                )),
           ],
         ),
       ),

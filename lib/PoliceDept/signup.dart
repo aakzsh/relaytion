@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:relaytion/PoliceDept/policeHome.dart';
-import 'package:relaytion/PoliceDept/signup.dart';
+import 'package:relaytion/PoliceDept/login.dart';
+import 'package:relaytion/PoliceDept/signup2.dart';
 
-class PoliceLogin extends StatefulWidget {
+class PoliceSignup extends StatefulWidget {
   @override
-  _PoliceLoginState createState() => _PoliceLoginState();
+  _PoliceSignupState createState() => _PoliceSignupState();
 }
 
-String email;
-String pass;
+String emaill, password;
 
-class _PoliceLoginState extends State<PoliceLogin> {
+class _PoliceSignupState extends State<PoliceSignup> {
   @override
   Widget build(BuildContext context) {
     double w = MediaQuery.of(context).size.width;
@@ -25,7 +23,7 @@ class _PoliceLoginState extends State<PoliceLogin> {
               padding: EdgeInsets.symmetric(horizontal: 40),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text("Log In",
+                child: Text("Register",
                     style: GoogleFonts.josefinSans(
                         fontSize: 35, fontWeight: FontWeight.bold)),
               ),
@@ -36,7 +34,7 @@ class _PoliceLoginState extends State<PoliceLogin> {
                   padding: EdgeInsets.symmetric(horizontal: 40),
                   child: TextField(
                     onChanged: (value) {
-                      email = value;
+                      emaill = value;
                     },
                     decoration: new InputDecoration(
                       labelText: "Email",
@@ -50,7 +48,7 @@ class _PoliceLoginState extends State<PoliceLogin> {
                   padding: EdgeInsets.symmetric(horizontal: 40),
                   child: TextField(
                     onChanged: (value) {
-                      pass = value;
+                      password = value;
                     },
                     decoration: new InputDecoration(
                       labelText: "Password",
@@ -67,45 +65,21 @@ class _PoliceLoginState extends State<PoliceLogin> {
               minWidth: w - 80,
               color: Color.fromRGBO(223, 74, 74, 1),
               onPressed: () async {
-                await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(email: email, password: pass)
-                    .then((value) {
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PoliceHome(),
-                      ));
-                }).catchError((err) {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text("Error"),
-                          content: Text(err.message),
-                          actions: [
-                            TextButton(
-                              child: Text("Ok"),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            )
-                          ],
-                        );
-                      });
-                });
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => PoliceSignup2()));
               },
               child: Text(
-                "LogIn",
+                "Next",
                 style: TextStyle(color: Colors.white, fontSize: 20),
               ),
             ),
             MaterialButton(
                 onPressed: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => PoliceSignup()));
+                      MaterialPageRoute(builder: (context) => PoliceLogin()));
                 },
                 child: Text(
-                  "Don't have an account? Register",
+                  "Already have an account? Login",
                   style: TextStyle(color: Colors.blue),
                 )),
           ],
