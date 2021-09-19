@@ -39,6 +39,7 @@ dependencies:
   geolocator: ^5.1.0
   google_maps_webservice: ^0.0.19
   http: ^0.13.3
+  hypertrack_plugin: ^0.2.1
   
  
 dev_dependencies:

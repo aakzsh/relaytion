@@ -49,8 +49,6 @@ class _PoliceHomeState extends State<PoliceHome> {
                           value = true;
                         });
                       },
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
                     ),
                     Container(
                       child: Column(

@@ -10,6 +10,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../twilio.dart';
 
+const String publishableKey =
+    '8lJwCx_DdzUNa_nON2jj4InfI9nROC3h2HSdVmEndAamtN2XK7Y3c7cB1KqKJA4RiJieQlVC2TPzCNlg2Df0ag';
+
 class Request extends StatefulWidget {
   @override
   State<Request> createState() => RequestState();
@@ -212,9 +215,10 @@ class RequestState extends State<Request> {
                             .collection('notifications');
 
                         final data = {
-                          "to": to,
-                          "from": from,
-                          "purpose": purposeController.text
+                          "to": from,
+                          "from": to,
+                          "purpose": purposeController.text,
+                          "location": toPlaceMark[0].name
                         };
 
                         final result = await notifs.add(data);
