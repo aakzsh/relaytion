@@ -120,11 +120,11 @@ class _PoliceSignup2State extends State<PoliceSignup2> {
                 if (otp1 == otp2) {
                   await FirebaseAuth.instance
                       .createUserWithEmailAndPassword(
-                          email: email, password: password)
+                          email: emaill, password: password)
                       .then((value) {
                     if (value.user != null) {
                       FirebaseFirestore.instance
-                          .collection("hospitals")
+                          .collection("police")
                           .doc(value.user?.uid)
                           .set({
                         "location": location,

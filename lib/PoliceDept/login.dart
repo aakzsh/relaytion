@@ -38,7 +38,7 @@ class _PoliceLoginState extends State<PoliceLogin> {
                     onChanged: (value) {
                       email = value;
                     },
-                    obscureText: true,
+                    obscureText: false,
                     decoration: new InputDecoration(
                       labelText: "Email",
                     ),
@@ -53,6 +53,7 @@ class _PoliceLoginState extends State<PoliceLogin> {
                     onChanged: (value) {
                       pass = value;
                     },
+                    obscureText: true,
                     decoration: new InputDecoration(
                       labelText: "Password",
                     ),
