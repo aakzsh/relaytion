@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:relaytion/HealthCare/login.dart';
+import 'package:relaytion/HealthCare/request.dart';
 import 'package:relaytion/PoliceDept/login.dart';
 
 void main() async {
@@ -46,10 +47,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 MaterialButton(
                     child: Text("Healthcare side"),
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => HospitalLogin()));
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => Request()));
                     }),
                 MaterialButton(
                     child: Text("Police side"),

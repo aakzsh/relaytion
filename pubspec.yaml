@@ -33,6 +33,11 @@ dependencies:
   cloud_firestore:
   twilio_flutter:
   google_fonts:
+  google_maps_flutter: 
+  geocoder:
+  location:
+  geolocator: ^7.6.2
+  
  
 dev_dependencies:
   flutter_test:
