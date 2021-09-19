@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:relaytion/HealthCare/login.dart';
 import 'package:relaytion/PoliceDept/login.dart';
 
@@ -16,6 +17,9 @@ class MyApp extends StatelessWidget {
       title: 'Relaytion',
       theme: ThemeData(
         primarySwatch: Colors.red,
+        textTheme: GoogleFonts.poppinsTextTheme(
+          Theme.of(context).textTheme,
+        ),
       ),
       home: WelcomeScreen(),
     );
