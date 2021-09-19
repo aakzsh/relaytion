@@ -48,6 +48,7 @@ class _HospitalLoginState extends State<HospitalLogin> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 40),
                   child: TextField(
+                    obscureText: true,
                     onChanged: (value) {
                       pass = value;
                     },

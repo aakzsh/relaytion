@@ -1,10 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:relaytion/HealthCare/home.dart';
 import 'package:relaytion/HealthCare/login.dart';
-import 'package:relaytion/HealthCare/request.dart';
 import 'package:relaytion/HealthCare/signup.dart';
 import 'package:relaytion/PoliceDept/login.dart';
+import 'package:relaytion/PoliceDept/policeHome.dart';
 import 'package:relaytion/PoliceDept/signup.dart';
 
 void main() async {
@@ -64,14 +66,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     minWidth: w - 80,
                     color: Color.fromRGBO(223, 74, 74, 1),
                     child: Text(
-                      "Sign In As Hospital Department",
+                      "Continue As Hospital Department",
                       style: TextStyle(color: Colors.white, fontSize: 14),
                     ),
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => HospitalLogin()));
+                      if (FirebaseAuth.instance.currentUser != null) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HospitalHome()));
+                      } else {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PoliceHome()));
+                      }
                     }),
                 SizedBox(
                   height: 50,
@@ -84,15 +93,22 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     height: 60,
                     minWidth: w - 80,
                     color: Colors.white,
-                    child: Text("Sign In As Police Official",
+                    child: Text("Continue In As Police Official",
                         style: TextStyle(
                             color: Color.fromRGBO(223, 74, 74, 1),
                             fontSize: 14)),
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PoliceLogin()));
+                      if (FirebaseAuth.instance.currentUser != null) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PoliceHome()));
+                      } else {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PoliceLogin()));
+                      }
                     })
               ],
             ),

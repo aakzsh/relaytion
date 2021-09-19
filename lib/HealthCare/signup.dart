@@ -50,6 +50,7 @@ class _HospitalSignupState extends State<HospitalSignup> {
                     onChanged: (value) {
                       password = value;
                     },
+                    obscureText: true,
                     decoration: new InputDecoration(
                       labelText: "Password",
                     ),

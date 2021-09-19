@@ -50,6 +50,7 @@ class _PoliceSignupState extends State<PoliceSignup> {
                     onChanged: (value) {
                       password = value;
                     },
+                    obscureText: true,
                     decoration: new InputDecoration(
                       labelText: "Password",
                     ),
