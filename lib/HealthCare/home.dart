@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:relaytion/HealthCare/newCorridor.dart';
 import 'package:relaytion/HealthCare/profile.dart';
+import 'package:relaytion/HealthCare/request.dart';
 
 class HospitalHome extends StatefulWidget {
   @override
@@ -19,7 +20,7 @@ class _HospitalHomeState extends State<HospitalHome> {
             MaterialButton(
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => NewCorridor()));
+                    MaterialPageRoute(builder: (context) => Request()));
               },
               child: Text("Request Corridor"),
             ),

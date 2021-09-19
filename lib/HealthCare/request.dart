@@ -6,6 +6,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import './requests/google_map_requests.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../twilio.dart';
+
 class Request extends StatefulWidget {
   @override
   State<Request> createState() => RequestState();
@@ -20,6 +24,9 @@ class RequestState extends State<Request> {
   final Set<Polyline> _polyLines = {};
   TextEditingController locationController = TextEditingController();
   TextEditingController destinationController = TextEditingController();
+  TextEditingController purposeController = TextEditingController();
+
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
@@ -52,7 +59,7 @@ class RequestState extends State<Request> {
                   onMapCreated: (GoogleMapController controller) {
                     _controller.complete(controller);
                   },
-                  markers: _markers,
+                  markers: Set.from(_markers),
                   myLocationButtonEnabled: true,
                   onCameraMove: onCameraMove,
                   polylines: _polyLines,
@@ -137,6 +144,118 @@ class RequestState extends State<Request> {
                     ),
                   ),
                 ),
+                Positioned(
+                  top: 160.0,
+                  right: 15.0,
+                  left: 15.0,
+                  child: Container(
+                    height: 50.0,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3.0),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.grey,
+                            offset: Offset(1.0, 5.0),
+                            blurRadius: 10,
+                            spreadRadius: 3)
+                      ],
+                    ),
+                    child: TextField(
+                      controller: purposeController,
+                      cursorColor: Colors.black,
+                      decoration: InputDecoration(
+                        icon: Container(
+                          margin: EdgeInsets.only(left: 20, top: 5),
+                          width: 10,
+                          height: 10,
+                          child: Icon(
+                            Icons.mail,
+                            color: Colors.black,
+                          ),
+                        ),
+                        hintText: "Purpose",
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.only(left: 15.0, top: 16.0),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 50.0,
+                  right: 15.0,
+                  left: 15.0,
+                  child: Container(
+                    height: 50.0,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3.0),
+                      color: Colors.white,
+                    ),
+                    child: MaterialButton(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                          side: BorderSide(
+                              color: Color.fromRGBO(223, 74, 74, 1))),
+                      height: 60,
+                      color: Color.fromRGBO(223, 74, 74, 1),
+                      onPressed: () async {
+                        List<Placemark> toPlaceMark = await Geolocator()
+                            .placemarkFromAddress(locationController.text);
+                        final String to = toPlaceMark[0].locality;
+                        List<Placemark> fromPlaceMark = await Geolocator()
+                            .placemarkFromAddress(destinationController.text);
+                        final String from = fromPlaceMark[0].locality;
+
+                        CollectionReference notifs = FirebaseFirestore.instance
+                            .collection('notifications');
+
+                        final data = {
+                          "to": to,
+                          "from": from,
+                          "purpose": purposeController.text
+                        };
+
+                        final result = await notifs.add(data);
+
+                        //send sms
+                        CollectionReference police =
+                            FirebaseFirestore.instance.collection('police');
+
+                        police
+                            .where('location', isEqualTo: from)
+                            .get()
+                            .then((QuerySnapshot querySnapshot) {
+                          querySnapshot.docs.forEach((doc) {
+                            var phone = doc['phone'].toString();
+                            twilioFlutter.sendSMS(
+                                toNumber: phone,
+                                messageBody:
+                                    'EMERGENCY!! \n$from to $to traffic needs to be made into a green corridor ASAP!! \nPurpose - ${purposeController.text}. \nPlease do the needful');
+                          });
+                        });
+
+                        police
+                            .where('location', isEqualTo: to)
+                            .get()
+                            .then((QuerySnapshot querySnapshot) {
+                          querySnapshot.docs.forEach((doc) {
+                            var phone = doc['phone'].toString();
+                            twilioFlutter.sendSMS(
+                                toNumber: phone,
+                                messageBody:
+                                    'EMERGENCY!! \n$from to $to traffic needs to be made into a green corridor ASAP!! \nPurpose - ${purposeController.text}. \nPlease do the needful');
+                          });
+                        });
+                      },
+                      child: Text(
+                        "Notify Concerned Officials",
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           );
@@ -207,6 +326,8 @@ class RequestState extends State<Request> {
     print(
         "the latitude is: ${position.longitude} and the longitude is: ${position.longitude} ");
     print("initial position is : ${_initialPosition.toString()}");
+    _addMarker(
+        LatLng(position.latitude, position.longitude), placemark[0].name);
     locationController.text = placemark[0].name;
   }
 
@@ -219,9 +340,9 @@ class RequestState extends State<Request> {
     print("====================================");
     print(intendedLocation);
     _addMarker(destination, intendedLocation);
-    String route = await _googleMapsServices.getRouteCoordinates(
-        _initialPosition, destination);
-    createRoute(route);
+    // String route = await _googleMapsServices.getRouteCoordinates(
+    //     _initialPosition, destination);
+    // createRoute(route);
     // notifyListeners();
   }
 
