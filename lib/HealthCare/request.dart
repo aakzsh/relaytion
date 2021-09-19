@@ -50,13 +50,10 @@
 //   }
 // }
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:location/location.dart';
-import 'package:geocoder/geocoder.dart';
-import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 
 class Request extends StatefulWidget {
   @override
@@ -64,147 +61,249 @@ class Request extends StatefulWidget {
 }
 
 class _RequestState extends State<Request> {
-  LocationData _currentPosition;
-  String _address, _dateTime;
   GoogleMapController mapController;
-  Marker marker;
-  Location location = Location();
+  Position _position;
+  String currentLocation;
 
-  GoogleMapController _controller;
-  LatLng _initialcameraposition = LatLng(0.5937, 0.9629);
+  //adding markers
+  List<Marker> myMarker = <Marker>[];
+
+  int _selectedIndex = 0;
+
+  void _onMapCreated(GoogleMapController controller) async {
+    mapController = controller;
+  }
+
+  void _showBottomSheet() {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          Size size = MediaQuery.of(context).size;
+          return SafeArea(
+            child: Scaffold(
+              body: Stack(
+                children: [
+                  SingleChildScrollView(
+                    child: Container(
+                      constraints: BoxConstraints(
+                        minHeight: size.height - (size.height * 0.33),
+                      ),
+                      width: size.width,
+                      margin: EdgeInsets.only(
+                        top: size.height * 0.06,
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 25,
+                        vertical: 30,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(50),
+                          topRight: Radius.circular(50),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          titlePrice(context: context),
+                          SizedBox(height: 30),
+                          Row(
+                            children: [
+                              customButton(
+                                text: "Address",
+                                iconData: Icons.location_on_rounded,
+                              ),
+                              SizedBox(width: 25),
+                              customButton(
+                                text: "Call",
+                                iconData: Icons.call,
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          Row(
+                            children: [
+                              customButton(
+                                text: "Visit Website",
+                                iconData: Icons.web,
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 30),
+                          Text(
+                            "Small pottery shop based out of Jaipur\nSpecialities: Printed pots, matkas.",
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 17,
+                            ),
+                          ),
+                          SizedBox(height: 30),
+                          Row(
+                            children: [
+                              customButton(text: "Pottery"),
+                              SizedBox(width: 10),
+                              customButton(text: "Rajasthanisakas"),
+                              SizedBox(width: 10),
+                              customButton(text: "Pottery"),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    getLoc();
+    _getCurrentLocation();
+
+    myMarker.add(Marker(
+      markerId: MarkerId("1"),
+      position: LatLng(27.391277, 73.232617),
+      onTap: _showBottomSheet,
+    ));
+
+    myMarker.add(Marker(
+      markerId: MarkerId("2"),
+      position: LatLng(27.091277, 74.222617),
+      onTap: _showBottomSheet,
+    ));
+
+    myMarker.add(Marker(
+      markerId: MarkerId("2"),
+      position: LatLng(27.091277, 73.292617),
+      onTap: _showBottomSheet,
+    ));
   }
 
-  void _onMapCreated(GoogleMapController _cntlr) {
-    _controller = _controller;
-    location.onLocationChanged.listen((l) {
-      _controller.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(target: LatLng(l.latitude, l.longitude), zoom: 15),
-        ),
-      );
-    });
+  void _getCurrentLocation() async {
+    LocationPermission permission;
+
+    permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+
+      if (permission == LocationPermission.denied) {
+        setState(() {
+          currentLocation = "permission denied";
+        });
+      } else {
+        var position = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high);
+        setState(() {
+          // currentLocation ="latitude: ${position.latitude}" + " , " + "Logitude: ${position.longitude}";
+          _position = position;
+        });
+      }
+    } else {
+      var position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        _position = position;
+        // currentLocation ="latitude: ${position.latitude}" + " , " + "Logitude: ${position.longitude}";
+      });
+    }
+    print(_position);
+    if (_position != null) {
+      CameraUpdate cameraUpdate = CameraUpdate.newLatLngZoom(
+          LatLng(_position.latitude, _position.longitude), 10);
+      mapController.animateCamera(cameraUpdate);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: SafeArea(
-          child: Container(
-            color: Colors.blueGrey.withOpacity(.8),
-            child: Center(
-              child: Column(
-                children: [
-                  Container(
-                    height: MediaQuery.of(context).size.height / 2.5,
-                    width: MediaQuery.of(context).size.width,
-                    child: GoogleMap(
-                      initialCameraPosition: CameraPosition(
-                          target: _initialcameraposition, zoom: 15),
-                      mapType: MapType.normal,
-                      onMapCreated: _onMapCreated,
-                      myLocationEnabled: true,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 3,
-                  ),
-                  if (_dateTime != null)
-                    Text(
-                      "Date/Time: $_dateTime",
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.white,
-                      ),
-                    ),
-                  SizedBox(
-                    height: 3,
-                  ),
-                  if (_currentPosition != null)
-                    Text(
-                      "Latitude: ${_currentPosition.latitude}, Longitude: ${_currentPosition.longitude}",
-                      style: TextStyle(
-                          fontSize: 22,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  SizedBox(
-                    height: 3,
-                  ),
-                  if (_address != null)
-                    Text(
-                      "Address: $_address",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
-                  SizedBox(
-                    height: 3,
-                  ),
-                ],
-              ),
-            ),
-          ),
+      appBar: AppBar(
+        title: Text("Local Shops near you"),
+        centerTitle: true,
+      ),
+      body: GoogleMap(
+        onMapCreated: _onMapCreated,
+        myLocationButtonEnabled: true,
+        initialCameraPosition: CameraPosition(
+          target: LatLng(37.43296265331129, -122.08832357078792),
+          zoom: 11.0,
         ),
+        markers: Set.from(myMarker),
       ),
     );
   }
-
-  getLoc() async {
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
-
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
-        return;
-      }
-    }
-
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
-
-    _currentPosition = await location.getLocation();
-    _initialcameraposition =
-        LatLng(_currentPosition.latitude, _currentPosition.longitude);
-    location.onLocationChanged.listen((LocationData currentLocation) {
-      print("${currentLocation.longitude} : ${currentLocation.longitude}");
-      setState(() {
-        _currentPosition = currentLocation;
-        _initialcameraposition =
-            LatLng(_currentPosition.latitude, _currentPosition.longitude);
-
-        DateTime now = DateTime.now();
-        _dateTime = DateFormat('EEE d MMM kk:mm:ss ').format(now);
-        _getAddress(_currentPosition.latitude, _currentPosition.longitude)
-            .then((value) {
-          setState(() {
-            _address = "${value.first.addressLine}";
-          });
-        });
-      });
-    });
-  }
 }
 
-Future<List<Address>> _getAddress(double lat, double lang) async {
-  final coordinates = new Coordinates(lat, lang);
-  List<Address> add =
-      await Geocoder.local.findAddressesFromCoordinates(coordinates);
-  return add;
+Widget customButton({
+  @required String text,
+  IconData iconData,
+}) {
+  return Expanded(
+    child: Container(
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+      decoration: BoxDecoration(
+        color: Colors.green,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Flexible(
+            child: Text(
+              text,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              softWrap: false,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          (iconData != null)
+              ? Padding(
+                  padding: EdgeInsets.only(left: 5),
+                  child: Icon(
+                    iconData,
+                    color: Colors.white,
+                  ),
+                )
+              : Container(height: 0, width: 0),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget titlePrice({@required BuildContext context}) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Local Pottery shop",
+            style: TextStyle(
+              color: Colors.black54,
+              fontSize: 18,
+            ),
+          ),
+        ],
+      ),
+      Text(
+        "₹ 40-80",
+        style: GoogleFonts.dmSans(
+          color: Colors.black45,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ],
+  );
 }
